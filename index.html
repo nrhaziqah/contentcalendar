@@ -129,11 +129,11 @@ function statusSelect(it){const opts=(it.workstream==='Website'?WEBSITE_STATUSES
 async function changeStatus(id,status){const it=items.find(x=>x.id===id);if(!it)return;it.status=status;it.updated_at=new Date().toISOString();saveLocal();render();await updateItemCloud(it)}
 function detectFamily(text){const s=text.toLowerCase();if(s.includes('ddss')||s.includes('dean')&&s.includes('distinguished'))return'DDSS';if(s.includes('pri')||s.includes('ecgi')||s.includes('sustainable business')||s.includes('public lecture series'))return'PRI';if(s.includes('knowledge lab')||s.includes('nbs kl')||s.includes(' kl ')||s.includes('webinar'))return'NBS KL';if(s.includes('co-branded')||s.includes('cobranded')||s.includes('sap')||s.includes('uob'))return'Co-branded';return'Other'}
 function detectFormat(text){const s=text.toLowerCase();if(s.includes('hybrid')||s.includes('zoom')&&s.includes('in-person')||s.includes('physical and online'))return'Hybrid';if(s.includes('online')||s.includes('webinar')||s.includes('virtual')||s.includes('zoom'))return'Online';if(s.includes('in-person')||s.includes('physical')||s.includes('auditorium')||s.includes('lt '))return'In-person';return'Other'}
-function defaultFormatForFamily(fam){if(fam==='DDSS')return'Hybrid';if(fam==='NBS KL')return'Online';return'Other'}
+function defaultFormatForFamily(fam){if(fam==='DDSS')return'Hybrid';if(fam==='PRI')return'Hybrid';if(fam==='NBS KL')return'Online';return'Other'}
 function parseEventDateFromName(text){
   const s=String(text||'').replace(/[.,]/g,' ').replace(/\s+/g,' ').trim();
   const months={jan:0,january:0,feb:1,february:1,mar:2,march:2,apr:3,april:3,may:4,jun:5,june:5,jul:6,july:6,aug:7,august:7,sep:8,sept:8,september:8,oct:9,october:9,nov:10,november:10,dec:11,december:11};
-  let m=s.match(/(\d{1,2})(?:st|nd|rd|th)?\s+(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:\s+(20\d{2}))?/i);
+  let m=s.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:\s+(20\d{2}))?\b/i);
   if(!m)return null;
   const day=Number(m[1]);
   const monthKey=m[2].toLowerCase();
