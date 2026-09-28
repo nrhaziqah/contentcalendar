@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>heartfaeries — Content Calendar</title>
+<title>Content Calendar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,19 +17,8 @@ body{margin:0;font-family:var(--font);color:var(--ink);background:radial-gradien
 <div class="app">
   <aside class="sidebar">
     <div class="brand"><div class="brand-dot"><i class="ti ti-heart"></i></div>heartfaeries</div>
-    <div class="nav-item active"><i class="ti ti-calendar-month"></i> Content Calendar</div>
-    <div class="nav-item" onclick="openSingleModal()"><i class="ti ti-plus"></i> Add single post</div>
-    <div class="nav-item" onclick="openEventModal()"><i class="ti ti-sparkles"></i> Add ER event</div>
-    <div class="nav-sep"></div>
-    <div class="nav-item" onclick="setTeamFilter('ER')"><i class="ti ti-speakerphone"></i> ER / External Relations</div>
-    <div class="nav-item" onclick="setTeamFilter('Undergraduate')"><i class="ti ti-school"></i> Undergraduate</div>
-    <div class="nav-item" onclick="setTeamFilter('Graduate Studies')"><i class="ti ti-certificate"></i> Graduate Studies</div>
-    <div class="nav-item" onclick="setTeamFilter('Research')"><i class="ti ti-microscope"></i> Research</div>
-    <div class="nav-item" onclick="setTeamFilter('Alumni')"><i class="ti ti-users"></i> Alumni</div>
-    <div class="nav-item" onclick="setTeamFilter('Corporate')"><i class="ti ti-building"></i> Corporate</div>
-    <div class="nav-sep"></div>
-    <div class="nav-item" onclick="exportData()"><i class="ti ti-download"></i> Export backup</div>
-    <label class="nav-item" style="cursor:pointer"><i class="ti ti-upload"></i> Import backup<input type="file" accept=".json,application/json" style="display:none" onchange="importData(event)"></label>
+    <div class="nav-item active" onclick="setTeamFilter('In the Media')"><i class="ti ti-news"></i> In the Media</div>
+    <div class="nav-item" onclick="setTeamFilter('ER')"><i class="ti ti-speakerphone"></i> External Relations</div>
   </aside>
   <main class="main">
     <div class="top">
@@ -44,7 +33,7 @@ body{margin:0;font-family:var(--font);color:var(--ink);background:radial-gradien
 
     <div class="toolbar">
       <div class="month-nav"><button class="icon-btn" onclick="moveMonth(-1)"><i class="ti ti-chevron-left"></i></button><div class="month-label" id="monthLabel"></div><button class="icon-btn" onclick="moveMonth(1)"><i class="ti ti-chevron-right"></i></button></div>
-      <select class="control" id="teamFilter" onchange="render()"><option value="All">All teams</option></select>
+      <select class="control" id="teamFilter" onchange="render()"><option value="All">All sections</option></select>
       <select class="control" id="typeFilter" onchange="render()"><option value="All">All content types</option></select>
       <select class="control" id="platformFilter" onchange="render()"><option value="All">All platforms</option></select>
       <select class="control" id="statusFilter" onchange="render()"><option value="All">All statuses</option></select>
@@ -75,7 +64,7 @@ const SUPABASE_ANON_KEY='sb_publishable_Vky1aAI1BjXAWm2IgOMPhg_V8FxrVoo';
 const supabaseClient = window.supabase && SUPABASE_URL ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const TEAMS=['ER','Undergraduate','Graduate Studies','Research','Alumni','Corporate','Campaigns','Other'];
+const TEAMS=['In the Media','ER'];
 const PLATFORMS=['LinkedIn','Instagram','Facebook','Website','EDM','YouTube','Other'];
 const SOCIAL_STATUSES=['Not started','Drafted','Sent for approval','Cleared','Scheduled'];
 const WEBSITE_STATUSES=['Not started','Published'];
@@ -114,7 +103,7 @@ async function deleteItemCloud(id){if(!authUser)return;await supabaseClient.from
 function uuid(){return crypto?.randomUUID?.()||'id-'+Date.now()+'-'+Math.random().toString(16).slice(2)}
 function renderAuth(){const c=$('authCard');if(!c)return;if(authUser){c.innerHTML=`<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><b><i class="ti ti-cloud-check"></i> Cloud sync active</b><div class="subtitle">Signed in as ${esc(authUser.email)}. Data syncs via Supabase.</div></div><div class="actions"><button class="btn" onclick="loadCloud()"><i class="ti ti-refresh"></i> Sync now</button><button class="btn" onclick="logout()"><i class="ti ti-logout"></i> Log out</button></div></div>`}else{c.innerHTML=`<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><b><i class="ti ti-cloud"></i> Cloud sync</b><div class="subtitle">Log in to sync. Without login, this app saves locally in the browser.</div></div><div class="actions"><input class="control" id="authEmail" type="email" placeholder="Email"><input class="control" id="authPassword" type="password" placeholder="Password"><button class="btn primary" onclick="login()"><i class="ti ti-login"></i> Log in</button><button class="btn" onclick="signup()">Sign up</button></div></div>`}}
 function populateFilters(){const add=(id,arr)=>{const el=$(id);if(!el)return;arr.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o)})};add('teamFilter',TEAMS);add('typeFilter',['Website Update','Social Media','Event Marker','Single Post','Photo Recap','Highlight Reel','Soundbite','Quote','Pre-publicity']);add('platformFilter',PLATFORMS);add('statusFilter',[...new Set([...SOCIAL_STATUSES,...WEBSITE_STATUSES])])}
-function setTeamFilter(v){$('teamFilter').value=v;render()}
+function setTeamFilter(v){$('teamFilter').value=v;document.querySelectorAll('.sidebar .nav-item').forEach(n=>n.classList.remove('active'));const target=Array.from(document.querySelectorAll('.sidebar .nav-item')).find(n=>n.textContent.trim()===(v==='ER'?'External Relations':'In the Media'));if(target)target.classList.add('active');render()}
 function filteredItems(){const team=$('teamFilter')?.value||'All', type=$('typeFilter')?.value||'All', platform=$('platformFilter')?.value||'All', status=$('statusFilter')?.value||'All', q=($('searchInput')?.value||'').toLowerCase();return items.filter(it=>{if(team!=='All'&&it.team!==team)return false;if(type!=='All'&&it.item_type!==type&&it.workstream!==type)return false;if(platform!=='All'&&!(it.platform||[]).includes(platform))return false;if(status!=='All'&&it.status!==status)return false;if(q&&!(`${it.title} ${it.notes||''} ${it.team} ${it.item_type}`.toLowerCase().includes(q)))return false;return true})}
 function render(){renderAuth();renderCalendar();renderPanels();renderDetail()}
 function moveMonth(n){cursor.setMonth(cursor.getMonth()+n);renderCalendar();renderPanels()}
